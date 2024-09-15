@@ -28,8 +28,9 @@
 ### 克隆仓库
 
 ```bash
-git clone https://github.com/qingshu-ui/example-ayaka.git
-cd example-ayaka
+git clone https://github.com/qingshu-ui/yns.git
+cd yns
+./gradlew build
 ```
 
 ### 模型下载
