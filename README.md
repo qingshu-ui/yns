@@ -1,4 +1,4 @@
-# YNS (Yolo and Siamese)
+# YNS
 
 [![License](https://img.shields.io/github/license/qingshu-ui/example-ayaka)](https://github.com/qingshu-ui/yns/blob/master/LICENSE)
 
