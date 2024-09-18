@@ -24,12 +24,15 @@ object MatUtils {
 
     /**
      * 等比例缩放
+     * @param image 图像矩阵
+     * @param targetSize 缩放大小
+     * @return [Mat] 新的矩阵
      */
-    fun letterbox(image: Mat, size: Size): Mat {
-        val (w, h) = size.width.toInt() to size.height.toInt()
+    fun letterbox(image: Mat, targetSize: Size): Mat {
+        val (w, h) = targetSize.width.toInt() to targetSize.height.toInt()
         val (iw, ih) = image.width() to image.height()
         val newImage = Mat()
-        val dst = Mat(size, CvType.CV_8UC3, Scalar(128.0, 128.0, 128.0))
+        val dst = Mat(targetSize, CvType.CV_8UC3, Scalar(128.0, 128.0, 128.0))
         try {
             val scale = minOf(w.toDouble() / iw, h.toDouble() / ih)
             val (nw, nh) = (iw * scale).toInt() to (ih * scale).toInt()
@@ -48,6 +51,10 @@ object MatUtils {
      * @param targetSize [Size]
      * @return [Mat]
      */
+    @Deprecated(
+        message = "There have been better implementations",
+        replaceWith = ReplaceWith("MatUtils.letterbox(mat, targetSize)"),
+    )
     fun scaleByPadding(mat: Mat, targetSize: Size): Mat {
 
         // 计算目标之间的缩放比列

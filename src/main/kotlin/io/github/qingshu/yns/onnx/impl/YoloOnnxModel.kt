@@ -1,9 +1,12 @@
-package io.github.qingshu.yns.test
+package io.github.qingshu.yns.onnx.impl
 
 import ai.onnxruntime.OnnxTensor
 import ai.onnxruntime.OrtSession
+import io.github.qingshu.yns.onnx.AbstractDetect
+import io.github.qingshu.yns.onnx.AbstractOnnxModel
+import io.github.qingshu.yns.dto.DetectStatus
+import io.github.qingshu.yns.dto.Detection
 import io.github.qingshu.yns.onnx.utils.MatUtils
-import io.github.qingshu.yns.onnx.yolo.Detection
 import nu.pattern.OpenCV
 import org.opencv.core.CvType
 import org.opencv.core.Mat
@@ -20,32 +23,25 @@ import java.nio.file.Files
  * See the LICENSE file for details.
  */
 class YoloOnnxModel(
-    modelPath: String
-) : AbstractOnnxModel<YoloOnnxModel.Detect>(modelPath) {
+    modelPath: String,
+    options: OrtSession.SessionOptions = OrtSession.SessionOptions(),
+) : AbstractOnnxModel<YoloOnnxModel.Detect>(modelPath, options) {
 
     data class Detect(
         var mat: Mat,
         var label: List<String>,
         var conf: Float = 0.3f,
         var iou: Float = 0.5f,
-        var status: DetectStatus = DetectStatus.PREPROCESS,
-        var result: OrtSession.Result? = null,
-        var tensors: MutableMap<String, OnnxTensor>? = null,
         var output: List<Detection>? = null,
-    ) : AutoCloseable {
-        override fun close() {
-            mat.release()
-            result?.close()
-            tensors?.forEach { it.value.close() }
-        }
-    }
+    ) : AbstractDetect()
 
     override fun preprocess(input: Detect): Detect {
         checkStatus(input.status, DetectStatus.PREPROCESS)
         val mat = input.mat
-        val size = inputSize[session.inputNames.first()]!!
+        val size = inputSize[inputNames.first()]!!
         // 1 letterbox
         val resizedMat = MatUtils.letterbox(mat, size)
+        //val resizedMat = MatUtils.scaleByPadding(mat,size)
 
         // 2 normalize
         resizedMat.convertTo(resizedMat, CvType.CV_32FC3, 1.0 / 255)
@@ -54,24 +50,13 @@ class YoloOnnxModel(
         val inputBuffer = FloatBuffer.allocate((size.height * size.width * resizedMat.channels()).toInt())
         MatUtils.hwc2chw(resizedMat, resizedMat)
         resizedMat.get(0, 0, inputBuffer.array())
+        resizedMat.release()
 
         // 4 create onnx tensor
         val tensor = OnnxTensor.createTensor(env, inputBuffer, inputShape[0])
         input.tensors = mutableMapOf(inputNames.first() to tensor)
         input.status = DetectStatus.INFERENCE
         return input
-    }
-
-    override fun runInference(tensors: Detect): Detect {
-        checkStatus(tensors.status, DetectStatus.INFERENCE)
-        val mTensors = tensors.tensors
-        var result: OrtSession.Result
-        synchronized(session) {
-            result = session.run(mTensors)
-        }
-        tensors.result = result
-        tensors.status = DetectStatus.POSTPROCESS
-        return tensors
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -116,14 +101,16 @@ class YoloOnnxModel(
         return result
     }
 
-    private fun checkStatus(status: DetectStatus, required: DetectStatus) {
-        require(status == required) {
-            "Invalid state for required: $required"
+    fun detect(imagePath: String, labelPath: String, conf: Float = 0.3f, iou: Float = 0.5f): List<Detection> {
+        val mat = Imgcodecs.imread(imagePath)
+        val labelFile = File(labelPath)
+        if (mat.empty() || !labelFile.exists()) {
+            throw IllegalArgumentException("Empty mat")
         }
+        return detect(mat, labelPath)
     }
 
-    fun detect(imagePath: String, labelPath: String): Detect {
-        val mat = Imgcodecs.imread(imagePath)
+    fun detect(mat: Mat, labelPath: String, conf: Float = 0.3f, iou: Float = 0.5f): List<Detection> {
         val labelFile = File(labelPath)
         if (mat.empty() || !labelFile.exists()) {
             throw IllegalArgumentException("Empty mat")
@@ -132,15 +119,24 @@ class YoloOnnxModel(
         val detect = Detect(
             mat = mat,
             label = label,
-            conf = 0.25f
+            conf = conf,
+            iou = iou
         )
+        return detect(detect)
+    }
+
+    fun detect(detect: Detect): List<Detection> {
         val preprocess = preprocess(detect)
         val runInference = runInference(preprocess)
         val postprocess = postprocess(runInference)
-        return postprocess
+        if(postprocess.status == DetectStatus.COMPLETED){
+            return postprocess.use { postprocess.output ?: emptyList() }
+        }
+        throw RuntimeException("Detection error!")
     }
 }
 
+/* Example
 fun main(vararg args: String) {
     OpenCV.loadLocally()
     val (modelPath, labelPath) = listOf(
@@ -155,8 +151,15 @@ fun main(vararg args: String) {
         "C:/Users/17186/Desktop/labelme/siamese/siamese-datasets/4.png",
         "C:/Users/17186/Desktop/labelme/siamese/siamese-datasets/5.png",
     )
-    val model = YoloOnnxModel(modelPath)
-    val result = model.detect(img2, labelPath)
-
-    println(result.output!!.size)
+    val model = YoloOnnxModel(
+        modelPath,
+        OrtSession.SessionOptions().apply {
+            this.setOptimizationLevel(OrtSession.SessionOptions.OptLevel.ALL_OPT)
+        }
+    )
+    model.use {
+        val result = model.detect(img2, labelPath)
+        println(result.size)
+    }
 }
+ */

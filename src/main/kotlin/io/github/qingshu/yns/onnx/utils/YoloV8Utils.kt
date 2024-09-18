@@ -1,9 +1,11 @@
 package io.github.qingshu.yns.onnx.utils
 
 
+import ai.onnxruntime.OrtSession
 import io.github.qingshu.yns.annotation.Slf4j
 import io.github.qingshu.yns.annotation.Slf4j.Companion.log
-import io.github.qingshu.yns.onnx.yolo.YOLO8
+import io.github.qingshu.yns.onnx.impl.YoloOnnxModel
+import nu.pattern.OpenCV
 import org.opencv.core.Mat
 import org.opencv.core.Rect
 import org.opencv.core.Size
@@ -21,7 +23,7 @@ object YoloV8Utils {
      * @param outPath 输出目录
      * @param model YOLO 模型
      */
-    fun clipImgToSiamese(inputPath: String, outPath: String, model: YOLO8) {
+    fun clipImgToSiamese(inputPath: String, outPath: String, model: YoloOnnxModel, labelPath: String)  {
         val inputDir = File(inputPath).also { it.mkdirs() }
         val outputDir = File(outPath).also { it.mkdirs() }
         if (!inputDir.isDirectory || !outputDir.isDirectory) {
@@ -29,7 +31,7 @@ object YoloV8Utils {
             return
         }
 
-        val imageFiles = inputDir.listFiles { file -> file.isFile && isImageFile(file) }?.forEach { imageFile ->
+        inputDir.listFiles { file -> file.isFile && isImageFile(file) }?.forEach { imageFile ->
             //log.info("Processing image: ${imageFile.name}")
 
             // Read input image
@@ -40,7 +42,7 @@ object YoloV8Utils {
             }
 
             // Detecting object using YOLO
-            val detections = model.detectObject(originalImage, conf = 0.51f)
+            val detections = model.detect(originalImage, labelPath = labelPath, conf = 0.51f)
 
             // Processing each bbox, crop it and adjust it to 105 * 105
             detections.forEachIndexed { index, (label, _, bbox) ->
@@ -74,20 +76,24 @@ object YoloV8Utils {
         return imageExtension.any { file.extension.equals(it, ignoreCase = true) }
     }
 }
-/*
+
 fun main(args: Array<String>) {
+    OpenCV.loadLocally()
     val (modelPath, labelPath, inputPath, outPath) = listOf(
         "d:/Users/17186/Downloads/Compressed/models/text-select/text-select-yolov8s.onnx",
         "d:/Users/17186/Downloads/Compressed/models/text-select/text-select-label.names",
         "C:/Users/17186/Desktop/labelme/siamese/siamese-datasets",
         "C:/Users/17186/Desktop/labelme/siamese/siamese-datasets/out2"
     )
-    val model = YOLO8.newInstance(modelPath = modelPath, labelPath = labelPath)
+    //val model = YOLO8.newInstance(modelPath = modelPath, labelPath = labelPath)
+    val modelLoadStartTime = System.currentTimeMillis()
+    val model = YoloOnnxModel(modelPath, OrtSession.SessionOptions())
+    val modelLoadEndTime = System.currentTimeMillis()
+    println("Model loaded in ${modelLoadEndTime - modelLoadStartTime} ms")
     val startTime = System.currentTimeMillis()
     model.use {
-        YoloV8Utils.clipImgToSiamese(inputPath, outPath, model)
+        YoloV8Utils.clipImgToSiamese(inputPath, outPath, model, labelPath)
     }
     val endTime = System.currentTimeMillis()
     println("Completed in ${endTime - startTime} ms")
 }
- */

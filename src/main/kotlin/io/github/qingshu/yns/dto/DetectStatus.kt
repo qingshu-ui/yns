@@ -1,4 +1,4 @@
-package io.github.qingshu.yns.test
+package io.github.qingshu.yns.dto
 
 /**
  * Copyright (c) 2024 qingshu.

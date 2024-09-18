@@ -1,8 +1,4 @@
-package io.github.qingshu.yns.test
-
-import ai.onnxruntime.OnnxTensor
-import ai.onnxruntime.OrtSession.Result
-import org.opencv.core.Mat
+package io.github.qingshu.yns.onnx
 
 /**
  * Copyright (c) 2024 qingshu.

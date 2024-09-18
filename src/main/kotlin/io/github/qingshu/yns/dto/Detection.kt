@@ -1,4 +1,4 @@
-package io.github.qingshu.yns.onnx.yolo
+package io.github.qingshu.yns.dto
 
 data class Detection(
     /**

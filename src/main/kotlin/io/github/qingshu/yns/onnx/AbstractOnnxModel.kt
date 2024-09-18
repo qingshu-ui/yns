@@ -1,8 +1,9 @@
-package io.github.qingshu.yns.test
+package io.github.qingshu.yns.onnx
 
 import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
 import ai.onnxruntime.TensorInfo
+import io.github.qingshu.yns.dto.DetectStatus
 import org.opencv.core.Size
 
 /**
@@ -13,13 +14,13 @@ import org.opencv.core.Size
  * See the LICENSE file for details.
  */
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-abstract class AbstractOnnxModel<T>(
-    private val modelPath: String,
-    private val option: OrtSession.SessionOptions = OrtSession.SessionOptions(),
-): OnnxModel<T> {
+abstract class AbstractOnnxModel<T: AbstractDetect>(
+    modelPath: String,
+    options: OrtSession.SessionOptions = OrtSession.SessionOptions(),
+): OnnxModel<T>, AutoCloseable {
     val env: OrtEnvironment = OrtEnvironment.getEnvironment()
-    val session: OrtSession = env.createSession(modelPath, option)
-    val inputNames: Set<String> = session.inputNames
+    val session: OrtSession = env.createSession(modelPath, options)
+    val inputNames: List<String> = session.inputNames.toList()
     var inputShape = listOf<LongArray>()
     var inputSize = mapOf<String, Size>()
 
@@ -40,5 +41,28 @@ abstract class AbstractOnnxModel<T>(
         inputShape = shape as List<LongArray>
         @Suppress("UNCHECKED_CAST")
         inputSize = size as Map<String, Size>
+    }
+
+    override fun close() {
+        session.close()
+        env.close()
+    }
+
+    override fun runInference(tensors: T): T {
+        checkStatus(tensors.status, DetectStatus.INFERENCE)
+        val mTensors = tensors.tensors
+        var result: OrtSession.Result
+        synchronized(session) {
+            result = session.run(mTensors)
+        }
+        tensors.result = result
+        tensors.status = DetectStatus.POSTPROCESS
+        return tensors
+    }
+
+    protected fun checkStatus(status: DetectStatus, required: DetectStatus){
+        require(status == required) {
+            "Invalid state for required: $required"
+        }
     }
 }

@@ -38,6 +38,7 @@ dependencies {
     // onnx and opencv
     implementation("ai.djl.opencv:opencv:0.29.0")
     implementation("com.microsoft.onnxruntime:onnxruntime:1.19.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 }
 
 kotlin {
