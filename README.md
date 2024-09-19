@@ -1,6 +1,6 @@
 # YNS
 
-[![License](https://img.shields.io/github/license/qingshu-ui/example-ayaka)](https://github.com/qingshu-ui/yns/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/qingshu-ui/yns)](https://github.com/qingshu-ui/yns/blob/master/LICENSE)
 
 ## 简介
 
