@@ -35,4 +35,4 @@ cd yns
 
 ### 模型下载
 
-> https://drive.google.com/drive/folders/16O7cpg8oXEB4W8Rixq-MoSrY9AMhZOsj?usp=sharing
+> https://drive.google.com/drive/folders/18g5o6is5eWo7kLCeXsFQ_RRknPrNOWfC?usp=sharing
