@@ -2,18 +2,17 @@ package io.github.qingshu.yns.onnx.impl
 
 import ai.onnxruntime.OnnxTensor
 import ai.onnxruntime.OrtSession
-import io.github.qingshu.yns.onnx.AbstractDetect
-import io.github.qingshu.yns.onnx.AbstractOnnxModel
 import io.github.qingshu.yns.dto.DetectStatus
 import io.github.qingshu.yns.dto.Detection
+import io.github.qingshu.yns.onnx.AbstractDetect
+import io.github.qingshu.yns.onnx.AbstractOnnxModel
 import io.github.qingshu.yns.onnx.utils.MatUtils
-import nu.pattern.OpenCV
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.imgcodecs.Imgcodecs
-import java.io.File
 import java.nio.FloatBuffer
 import java.nio.file.Files
+import kotlin.io.path.Path
 
 /**
  * Copyright (c) 2024 qingshu.
@@ -101,24 +100,21 @@ class YoloOnnxModel(
         return result
     }
 
-    fun detect(imagePath: String, labelPath: String, conf: Float = 0.3f, iou: Float = 0.5f): List<Detection> {
+    fun detect(imagePath: String, labels: List<String>, conf: Float = 0.3f, iou: Float = 0.5f): List<Detection> {
         val mat = Imgcodecs.imread(imagePath)
-        val labelFile = File(labelPath)
-        if (mat.empty() || !labelFile.exists()) {
+        if (mat.empty()) {
             throw IllegalArgumentException("Empty mat")
         }
-        return detect(mat, labelPath)
+        return detect(mat, labels)
     }
 
-    fun detect(mat: Mat, labelPath: String, conf: Float = 0.3f, iou: Float = 0.5f): List<Detection> {
-        val labelFile = File(labelPath)
-        if (mat.empty() || !labelFile.exists()) {
+    fun detect(mat: Mat, labels: List<String>, conf: Float = 0.3f, iou: Float = 0.5f): List<Detection> {
+        if (mat.empty()) {
             throw IllegalArgumentException("Empty mat")
         }
-        val label = Files.lines(labelFile.toPath()).toList()
         val detect = Detect(
             mat = mat,
-            label = label,
+            label = labels,
             conf = conf,
             iou = iou
         )
@@ -157,8 +153,9 @@ fun main(vararg args: String) {
             this.setOptimizationLevel(OrtSession.SessionOptions.OptLevel.ALL_OPT)
         }
     )
+    val labels = Files.lines(Path(labelPath)).toList()
     model.use {
-        val result = model.detect(img2, labelPath)
+        val result = model.detect(img2, labels)
         println(result.size)
     }
 }

@@ -13,6 +13,8 @@ import org.opencv.imgcodecs.Imgcodecs.imread
 import org.opencv.imgcodecs.Imgcodecs.imwrite
 import org.opencv.imgproc.Imgproc.resize
 import java.io.File
+import java.nio.file.Files
+import kotlin.io.path.Path
 
 /**
  * Copyright (c) 2024 qingshu.
@@ -33,6 +35,7 @@ object YoloV8Utils {
     fun clipImgToSiamese(inputPath: String, outPath: String, model: YoloOnnxModel, labelPath: String)  {
         val inputDir = File(inputPath).also { it.mkdirs() }
         val outputDir = File(outPath).also { it.mkdirs() }
+        val labels = Files.lines(Path(labelPath)).toList()
         if (!inputDir.isDirectory || !outputDir.isDirectory) {
             log.warn("'inputPath' or 'outPath' is not a directory")
             return
@@ -49,7 +52,7 @@ object YoloV8Utils {
             }
 
             // Detecting object using YOLO
-            val detections = model.detect(originalImage, labelPath = labelPath, conf = 0.51f)
+            val detections = model.detect(originalImage, labels = labels, conf = 0.51f)
 
             // Processing each bbox, crop it and adjust it to 105 * 105
             detections.forEachIndexed { index, (label, _, bbox) ->
