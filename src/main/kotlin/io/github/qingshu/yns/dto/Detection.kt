@@ -1,5 +1,12 @@
 package io.github.qingshu.yns.dto
 
+/**
+ * Copyright (c) 2024 qingshu.
+ * This file is part of the yns project.
+ *
+ * This project is licensed under the MIT License.
+ * See the LICENSE file for details.
+ */
 data class Detection(
     /**
      * 标签

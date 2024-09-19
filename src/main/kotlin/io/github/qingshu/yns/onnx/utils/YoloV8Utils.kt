@@ -14,6 +14,13 @@ import org.opencv.imgcodecs.Imgcodecs.imwrite
 import org.opencv.imgproc.Imgproc.resize
 import java.io.File
 
+/**
+ * Copyright (c) 2024 qingshu.
+ * This file is part of the yns project.
+ *
+ * This project is licensed under the MIT License.
+ * See the LICENSE file for details.
+ */
 @Slf4j
 object YoloV8Utils {
 

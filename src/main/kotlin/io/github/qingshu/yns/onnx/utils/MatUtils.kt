@@ -3,6 +3,13 @@ package io.github.qingshu.yns.onnx.utils
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
 
+/**
+ * Copyright (c) 2024 qingshu.
+ * This file is part of the yns project.
+ *
+ * This project is licensed under the MIT License.
+ * See the LICENSE file for details.
+ */
 object MatUtils {
 
     /**
@@ -89,12 +96,12 @@ object MatUtils {
     }
 
     /**
-     * 将 宽、高、通道 转换为 通道、宽、高
-     * whc to cwh
+     * 将 高、宽、通道 转换为 通道、高、宽
+     * hwc to chw
      * @param arr [FloatArray]
      * @return [FloatArray]
      */
-    fun whc2cwh(arr: FloatArray): FloatArray {
+    fun hwc2chw(arr: FloatArray): FloatArray {
         val temp = FloatArray(arr.size)
         var j = 0
         for (ch in 0 until 3) {

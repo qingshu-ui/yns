@@ -2,9 +2,9 @@ package io.github.qingshu.yns.onnx.impl
 
 import ai.onnxruntime.OnnxTensor
 import ai.onnxruntime.OrtSession.SessionOptions
+import io.github.qingshu.yns.dto.DetectStatus
 import io.github.qingshu.yns.onnx.AbstractDetect
 import io.github.qingshu.yns.onnx.AbstractOnnxModel
-import io.github.qingshu.yns.dto.DetectStatus
 import io.github.qingshu.yns.onnx.utils.MatUtils
 import nu.pattern.OpenCV
 import org.opencv.core.CvType
@@ -17,7 +17,7 @@ import kotlin.math.exp
  * Copyright (c) 2024 qingshu.
  * This file is part of the yns project.
  *
- * This project is licensed under the GPL-3.0 License.
+ * This project is licensed under the MIT License.
  * See the LICENSE file for details.
  */
 class SiameseOnnxModel(
@@ -112,19 +112,24 @@ class SiameseOnnxModel(
 fun main(args: Array<String>) {
     OpenCV.loadLocally()
     val input0 = listOf(
-        "C:/Users/17186/PycharmProjects/Siamese-pytorch/img/Angelic_01.png",
-        "C:/Users/17186/PycharmProjects/Siamese-pytorch/img/Angelic_02.png",
-        "C:/Users/17186/PycharmProjects/Siamese-pytorch/img/Atem_01.png",
-        "C:/Users/17186/PycharmProjects/Siamese-pytorch/img/Atl_01.png",
+        "C:/Users/17186/Desktop/labelme/siamese/siamese-datasets/out2/0_char_1.png",
     )
-    val modelPath = "d:/Users/17186/Downloads/Compressed/models/text-select/siamese-model.onnx"
+    val input1 = listOf(
+        "C:/Users/17186/Desktop/labelme/siamese/siamese-datasets/out2/0_target_7.png",
+        "C:/Users/17186/Desktop/labelme/siamese/siamese-datasets/out2/0_target_6.png",
+        "C:/Users/17186/Desktop/labelme/siamese/siamese-datasets/out2/0_target_5.png",
+        "C:/Users/17186/Desktop/labelme/siamese/siamese-datasets/out2/0_target_4.png",
+    )
+    val modelPath = "d:\\Users\\17186\\Downloads\\Compressed\\models\\text-select\\siamese_model.onnx"
     val model = SiameseOnnxModel(modelPath, SessionOptions().apply {
         setOptimizationLevel(SessionOptions.OptLevel.ALL_OPT)
     })
 
     model.use {
-        val result = model.detect(input0[0], input0[1])
-        println(result)
+        input1.forEach {
+            val result = model.detect(input0[0], it)
+            println(it.substring(it.indexOf("out2/"), it.length) +" === "+ result)
+        }
     }
 }
  */

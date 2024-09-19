@@ -19,7 +19,7 @@ import java.nio.file.Files
  * Copyright (c) 2024 qingshu.
  * This file is part of the yns project.
  *
- * This project is licensed under the GPL-3.0 License.
+ * This project is licensed under the MIT License.
  * See the LICENSE file for details.
  */
 class YoloOnnxModel(
