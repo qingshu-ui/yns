@@ -39,3 +39,8 @@ out/
 ### Kotlin ###
 .kotlin
 hs_err_pid7672.log
+
+### Other ###
+model/**
+!model/README.md
+logs/

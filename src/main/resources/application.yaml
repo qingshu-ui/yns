@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: yns
+
+yns:
+  text-select:
+    captcha:
+      enable: true
+      siamese-model-path: model/siamese-model.onnx
+      yolo-model-path: model/text-select-yolov8s.onnx
+      label-path: model/text-select-label.names
