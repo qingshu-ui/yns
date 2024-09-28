@@ -6,7 +6,6 @@ import io.github.qingshu.yns.dto.DetectStatus
 import io.github.qingshu.yns.onnx.AbstractDetect
 import io.github.qingshu.yns.onnx.AbstractOnnxModel
 import io.github.qingshu.yns.onnx.utils.MatUtils
-import nu.pattern.OpenCV
 import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.imgcodecs.Imgcodecs
