@@ -2,6 +2,9 @@ package io.github.qingshu.yns.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
+import kotlin.io.path.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.notExists
 
 /**
  * Copyright (c) 2024 qingshu.
@@ -32,4 +35,20 @@ data class TextSelectCaptchaProperties(
      * 是否启用此功能
      */
     var enable: Boolean = false,
-)
+
+    /**
+     * 在推理过程中产出图片的缓存目录
+     */
+    var imageCachePath: String = "cache"
+) {
+    init {
+        initCacheDir()
+    }
+
+    private fun initCacheDir() {
+        val cachePath = Path(imageCachePath)
+        if (cachePath.notExists()) {
+            cachePath.createDirectories()
+        }
+    }
+}

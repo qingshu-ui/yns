@@ -44,3 +44,5 @@ hs_err_pid7672.log
 model/**
 !model/README.md
 logs/
+yns.sqlite.db
+cache

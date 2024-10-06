@@ -103,7 +103,7 @@ class YoloOnnxModel(
         if (mat.empty()) {
             throw IllegalArgumentException("Empty mat")
         }
-        return detect(mat, labels)
+        return detect(mat, labels, conf, iou)
     }
 
     fun detect(mat: Mat, labels: List<String>, conf: Float = 0.3f, iou: Float = 0.5f): List<Detection> {

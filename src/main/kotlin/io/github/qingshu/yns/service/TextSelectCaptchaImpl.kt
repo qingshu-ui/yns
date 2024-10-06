@@ -56,7 +56,7 @@ class TextSelectCaptchaImpl(
 
         val matchedTargets = mutableListOf<Detection>()
 
-        for((charIndex, charMat) in charMats.withIndex()) {
+        for(charMat in charMats) {
             var bestMatchIndex = -1
             var bestSimilarity = Float.NEGATIVE_INFINITY
 

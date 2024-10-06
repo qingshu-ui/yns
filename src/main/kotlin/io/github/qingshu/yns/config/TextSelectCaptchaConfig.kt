@@ -5,6 +5,7 @@ import io.github.qingshu.yns.onnx.impl.SiameseOnnxModel
 import io.github.qingshu.yns.onnx.impl.YoloOnnxModel
 import io.github.qingshu.yns.service.TextSelectCaptcha
 import io.github.qingshu.yns.service.TextSelectCaptchaImpl
+import nu.pattern.OpenCV
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -36,5 +37,9 @@ class TextSelectCaptchaConfig {
         val yoloModel = YoloOnnxModel(yoloModelPath, options)
         val siameseModel = SiameseOnnxModel(siameseModelPath, options)
         return TextSelectCaptchaImpl(yoloModel, siameseModel, labelPath)
+    }
+
+    init {
+        OpenCV.loadLocally()
     }
 }
