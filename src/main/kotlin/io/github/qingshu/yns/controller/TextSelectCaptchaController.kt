@@ -48,7 +48,7 @@ class TextSelectCaptchaController(
         detections.forEachIndexed { index, detection ->
             detection.drawWithIndex(mat, index)
         }
-        val fileName = "${UUID.randomUUID()}.png"
+        val fileName = generateFileName()
         val savePath = Path(cfg.imageCachePath, fileName).pathString
         Imgcodecs.imwrite(savePath, mat)
         service.save(ImageCacheEntity(fileName = fileName))
@@ -73,4 +73,7 @@ class TextSelectCaptchaController(
             ResponseEntity.notFound().build()
         }
     }
+
+    private fun generateFileName(extension: String = ".png") =
+        "${UUID.randomUUID().toString().replace("-", "")}.$extension"
 }

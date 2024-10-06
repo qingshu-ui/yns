@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload Test</title>
+    <link rel="stylesheet" th:href="@{/css/reason.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Image Upload Test</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="imageFile">Select Image:</label>
+            <input type="file" id="imageFile" name="image" accept="image/*" required>
+        </div>
+        <button type="submit" id="uploadButton">Upload Image</button>
+    </form>
+    <div id="loadingIndicator" class="hidden">Uploading...</div>
+    <div id="errorMessage" class="error hidden"></div>
+    <div id="responseContainer" class="hidden">
+        <h3>Response:</h3>
+        <pre id="responseData"></pre>
+    </div>
+</div>
+<script th:src="@{/js/reason.js}"></script>
+</body>
+</html>

@@ -29,14 +29,37 @@
 
 ## 安装和使用
 
+### 环境准备
+
+- [JDK/JRE 17](https://adoptium.net/zh-CN/temurin/releases/?os=windows&arch=x64&package=jre&version=17)
+
 ### 克隆仓库
 
 ```bash
 git clone https://github.com/qingshu-ui/yns.git
 cd yns
-./gradlew build
 ```
 
 ### 模型下载
 
 > https://drive.google.com/drive/folders/18g5o6is5eWo7kLCeXsFQ_RRknPrNOWfC?usp=sharing
+
+将下载的模型放到 `module` 目录下
+
+### 项目构建
+- 快速运行
+```bash
+./gradlew bootRun
+```
+- 构建&运行
+
+```bash
+.gradlew build
+# build后的文件在build/libs
+cd build/libs
+java -jar yns-*.*.*-SNAPSHOT.jar
+```
+
+### 测试界面
+
+项目运行成功后在浏览器访问 http://localhost:8080/reason 可以快速测试接口
