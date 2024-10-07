@@ -54,7 +54,7 @@ cd yns
 - 构建&运行
 
 ```bash
-.gradlew build
+./gradlew build
 # build后的文件在build/libs
 cd build/libs
 java -jar yns-*.*.*-SNAPSHOT.jar
