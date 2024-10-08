@@ -1,7 +1,9 @@
 package io.github.qingshu.yns.service
 
 import io.github.qingshu.yns.dto.Detection
+import io.github.qingshu.yns.dto.ReasonResponseDto
 import org.opencv.core.Mat
+import org.springframework.web.multipart.MultipartFile
 
 /**
  * Copyright (c) 2024 qingshu.
@@ -15,4 +17,6 @@ interface TextSelectCaptcha {
     fun run(imagePath: String): List<Detection>
 
     fun run(image: Mat): List<Detection>
+
+    fun run(file: MultipartFile): ReasonResponseDto?
 }

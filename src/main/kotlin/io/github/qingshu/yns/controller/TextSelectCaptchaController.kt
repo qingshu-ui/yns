@@ -1,22 +1,14 @@
 package io.github.qingshu.yns.controller
 
 import io.github.qingshu.yns.config.TextSelectCaptchaProperties
-import io.github.qingshu.yns.dto.ReasonResponseDto
-import io.github.qingshu.yns.entity.ImageCacheEntity
-import io.github.qingshu.yns.service.ImageCacheService
 import io.github.qingshu.yns.service.TextSelectCaptcha
-import org.opencv.core.MatOfByte
-import org.opencv.imgcodecs.Imgcodecs
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.nio.file.Files
-import java.util.*
 import kotlin.io.path.Path
-import kotlin.io.path.pathString
 
 /**
  * Copyright (c) 2024 qingshu.
@@ -34,29 +26,15 @@ import kotlin.io.path.pathString
 )
 @RequestMapping("/text-select.captcha")
 class TextSelectCaptchaController(
-    val captcha: TextSelectCaptcha,
+    val service: TextSelectCaptcha,
     val cfg: TextSelectCaptchaProperties,
-    val service: ImageCacheService,
 ) {
 
     @PostMapping("/reason")
     fun reason(@RequestParam("image") image: MultipartFile): ResponseEntity<Any> {
-        val mat = Imgcodecs.imdecode(MatOfByte(*image.bytes), Imgcodecs.IMREAD_COLOR).apply {
-            if (empty()) return ResponseEntity.badRequest().body(mapOf("error" to "Could not load image"))
-        }
-        val detections = captcha.run(mat)
-        detections.forEachIndexed { index, detection ->
-            detection.drawWithIndex(mat, index)
-        }
-        val fileName = generateFileName()
-        val savePath = Path(cfg.imageCachePath, fileName).pathString
-        Imgcodecs.imwrite(savePath, mat)
-        service.save(ImageCacheEntity(fileName = fileName))
-        val cacheUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-            .pathSegment("text-select.captcha/cache")
-            .queryParam("file", fileName)
-            .build().toUriString()
-        return ResponseEntity.ok(ReasonResponseDto(cacheUrl, detections))
+        val response =
+            service.run(image) ?: return ResponseEntity.badRequest().body(mapOf("error" to "Could not load image"))
+        return ResponseEntity.ok(response)
     }
 
     @GetMapping("/cache")
@@ -74,6 +52,4 @@ class TextSelectCaptchaController(
         }
     }
 
-    private fun generateFileName(extension: String = ".png") =
-        "${UUID.randomUUID().toString().replace("-", "")}.$extension"
 }

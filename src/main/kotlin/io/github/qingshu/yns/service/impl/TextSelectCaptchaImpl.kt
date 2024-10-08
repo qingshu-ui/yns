@@ -1,14 +1,25 @@
-package io.github.qingshu.yns.service
+package io.github.qingshu.yns.service.impl
 
+import io.github.qingshu.yns.annotation.MeasureTime
+import io.github.qingshu.yns.config.TextSelectCaptchaProperties
 import io.github.qingshu.yns.dto.Detection
+import io.github.qingshu.yns.dto.ReasonResponseDto
+import io.github.qingshu.yns.entity.ImageCacheEntity
 import io.github.qingshu.yns.onnx.impl.SiameseOnnxModel
 import io.github.qingshu.yns.onnx.impl.YoloOnnxModel
+import io.github.qingshu.yns.service.ImageCacheService
+import io.github.qingshu.yns.service.TextSelectCaptcha
 import org.opencv.core.Mat
+import org.opencv.core.MatOfByte
 import org.opencv.core.Rect
 import org.opencv.highgui.HighGui
 import org.opencv.imgcodecs.Imgcodecs
+import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.nio.file.Files
+import java.util.*
 import kotlin.io.path.Path
+import kotlin.io.path.pathString
 
 /**
  * Copyright (c) 2024 qingshu.
@@ -17,10 +28,12 @@ import kotlin.io.path.Path
  * This project is licensed under the MIT License.
  * See the LICENSE file for details.
  */
-class TextSelectCaptchaImpl(
+open class TextSelectCaptchaImpl(
     private val yoloModel: YoloOnnxModel,
     private val siameseModel: SiameseOnnxModel,
-    private val labelPath: String,
+    labelPath: String,
+    private val service: ImageCacheService,
+    private val cfg: TextSelectCaptchaProperties,
 ): TextSelectCaptcha, AutoCloseable {
     private val labels = Files.lines(Path(labelPath)).toList()
 
@@ -86,6 +99,30 @@ class TextSelectCaptchaImpl(
         HighGui.waitKey(0)
         HighGui.destroyWindow(windowName)
     }
+
+    @MeasureTime("reasonTime")
+    override fun run(file: MultipartFile): ReasonResponseDto? {
+        val mat = Imgcodecs.imdecode(MatOfByte(*file.bytes), Imgcodecs.IMREAD_COLOR).apply {
+            if (empty()) return null
+        }
+        val detections = this.run(mat)
+        detections.forEachIndexed { index, detection ->
+            detection.drawWithIndex(mat, index)
+        }
+        val fileName = generateFileName()
+        val savePath = Path(cfg.imageCachePath, fileName).pathString
+        Imgcodecs.imwrite(savePath, mat)
+        service.save(ImageCacheEntity(fileName = fileName))
+        val cacheUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+            .pathSegment("text-select.captcha/cache")
+            .queryParam("file", fileName)
+            .build().toUriString()
+        return ReasonResponseDto(0, cacheUrl, detections)
+    }
+
+
+    private fun generateFileName(extension: String = ".png") =
+        "${UUID.randomUUID().toString().replace("-", "")}.$extension"
 }
 
 /* Example

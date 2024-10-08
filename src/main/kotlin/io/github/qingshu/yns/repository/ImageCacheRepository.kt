@@ -2,6 +2,7 @@ package io.github.qingshu.yns.repository
 
 import io.github.qingshu.yns.entity.ImageCacheEntity
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime
  * This project is licensed under the MIT License.
  * See the LICENSE file for details.
  */
+@Repository
 interface ImageCacheRepository : JpaRepository<ImageCacheEntity, Int> {
 
     @Transactional

@@ -19,6 +19,7 @@ import java.nio.FloatBuffer
  * This project is licensed under the MIT License.
  * See the LICENSE file for details.
  */
+@Suppress("MemberVisibilityCanBePrivate")
 class YoloOnnxModel(
     modelPath: String,
     options: OrtSession.SessionOptions = OrtSession.SessionOptions(),

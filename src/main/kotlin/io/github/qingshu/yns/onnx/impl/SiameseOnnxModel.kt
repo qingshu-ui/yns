@@ -19,6 +19,7 @@ import kotlin.math.exp
  * This project is licensed under the MIT License.
  * See the LICENSE file for details.
  */
+@Suppress("MemberVisibilityCanBePrivate")
 class SiameseOnnxModel(
     modelPath: String,
     options: SessionOptions = SessionOptions(),

@@ -3,8 +3,9 @@ package io.github.qingshu.yns.config
 import ai.onnxruntime.OrtSession
 import io.github.qingshu.yns.onnx.impl.SiameseOnnxModel
 import io.github.qingshu.yns.onnx.impl.YoloOnnxModel
+import io.github.qingshu.yns.service.ImageCacheService
 import io.github.qingshu.yns.service.TextSelectCaptcha
-import io.github.qingshu.yns.service.TextSelectCaptchaImpl
+import io.github.qingshu.yns.service.impl.TextSelectCaptchaImpl
 import nu.pattern.OpenCV
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
@@ -27,7 +28,11 @@ class TextSelectCaptchaConfig {
         havingValue = "true",
         matchIfMissing = false
     )
-    fun textSelectCaptcha(config: TextSelectCaptchaProperties): TextSelectCaptcha {
+    fun textSelectCaptcha(
+        config: TextSelectCaptchaProperties,
+        service: ImageCacheService,
+        cfg: TextSelectCaptchaProperties,
+    ): TextSelectCaptcha {
         val yoloModelPath = config.yoloModelPath
         val siameseModelPath = config.siameseModelPath
         val labelPath = config.labelPath
@@ -36,7 +41,7 @@ class TextSelectCaptchaConfig {
         }
         val yoloModel = YoloOnnxModel(yoloModelPath, options)
         val siameseModel = SiameseOnnxModel(siameseModelPath, options)
-        return TextSelectCaptchaImpl(yoloModel, siameseModel, labelPath)
+        return TextSelectCaptchaImpl(yoloModel, siameseModel, labelPath, service, cfg)
     }
 
     init {
