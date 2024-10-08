@@ -29,7 +29,9 @@ document.addEventListener('DOMContentLoaded', function() {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Server responded with an error');
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.error || 'Server responded with an error');
+                    })
                 }
                 return response.json();
             })
@@ -38,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 responseContainer.classList.remove('hidden');
             })
             .catch(error => {
-                showError('An error occurred while uploading the image');
+                showError(error.message || 'An error occurred while uploading the image');
                 console.error('Error:', error);
             })
             .finally(() => {

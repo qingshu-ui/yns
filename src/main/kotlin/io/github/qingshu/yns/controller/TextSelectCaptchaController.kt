@@ -1,5 +1,6 @@
 package io.github.qingshu.yns.controller
 
+import io.github.qingshu.yns.annotation.RateLimit
 import io.github.qingshu.yns.config.TextSelectCaptchaProperties
 import io.github.qingshu.yns.service.TextSelectCaptcha
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -30,6 +31,7 @@ class TextSelectCaptchaController(
     val cfg: TextSelectCaptchaProperties,
 ) {
 
+    @RateLimit
     @PostMapping("/reason")
     fun reason(@RequestParam("image") image: MultipartFile): ResponseEntity<Any> {
         val response =
