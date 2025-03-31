@@ -14,5 +14,5 @@ data class ImageCacheEntity(
     val fileName: String,
 
     @Column(nullable = false)
-    val expiresAt: LocalDateTime = LocalDateTime.now().plusDays(3),
+    val expiresAt: LocalDateTime = LocalDateTime.now().plusDays(1),
 )
